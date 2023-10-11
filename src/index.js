@@ -85,3 +85,9 @@ function scrollToNextPage() {
         behavior: "smooth",
     });
 }
+
+window.addEventListener("beforeunload", (event) => {
+    event.preventDefault();
+    event.returnValue = "";
+});
+
