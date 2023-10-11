@@ -20,39 +20,45 @@ const messageDiv = document.querySelector(".message");
 let currentPage = 1;
 let currentQuery = "";
 
-searchForm.addEventListener("submit", (e) => {
+searchForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     gallery.innerHTML = "";
     currentPage = 1;
     currentQuery = e.target.elements.searchQuery.value.trim();
-    fetchImages();
+    await fetchImages();
 });
 
-loadMoreBtn.addEventListener("click", fetchImages);
+loadMoreBtn.addEventListener("click", async () => {
+    await fetchImages();
+});
 
-function fetchImages() {
+async function fetchImages() {
     if (!currentQuery) {
         return;
     }
 
-    axios
-        .get("/?q=" + currentQuery + "&page=" + currentPage)
-        .then((response) => {
-            const images = response.data.hits;
+    try {
+        const response = await axios.get(`/?q=${currentQuery}&page=${currentPage}`);
+        const images = response.data.hits;
 
-            if (images.length === 0) {
-                Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-                return;
-            }
+        if (images.length === 0) {
+            Notiflix.Notify.failure("Вибачте, немає зображень, які відповідають вашому пошуковому запиту. Будь ласка спробуйте ще раз.");
+            return;
+        }
 
-            appendImages(images);
-            currentPage += 1;
-            scrollToNextPage();
-        })
-        .catch((error) => {
-            console.error("Error fetching images:", error);
-            Notiflix.Notify.failure("Oops! Something went wrong. Please try again later.");
-        });
+        appendImages(images);
+        currentPage += 1;
+        scrollToNextPage();
+
+        if (images.length < 40) {
+            loadMoreBtn.style.display = "none";
+        } else {
+            loadMoreBtn.style.display = "block";
+        }
+    } catch (error) {
+        console.error("Error fetching images:", error);
+        Notiflix.Notify.failure("Ой! Щось пішло не так. Будь-ласка спробуйте пізніше.");
+    }
 }
 
 function appendImages(images) {
@@ -90,3 +96,6 @@ window.addEventListener("beforeunload", (event) => {
     event.returnValue = "";
 });
 
+if (gallery.children.length < 1) {
+    loadMoreBtn.style.display = "none";
+}
