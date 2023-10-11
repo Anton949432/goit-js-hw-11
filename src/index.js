@@ -2,7 +2,7 @@
 import axios from "axios";
 import Notiflix from "notiflix";
 
-const apiKey = "YOUR_API_KEY_HERE";
+const apiKey = "39935227-75739c8736a388a48177e3f8a";
 
 axios.defaults.baseURL = "https://pixabay.com/api/";
 axios.defaults.params = {
